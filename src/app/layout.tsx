@@ -83,7 +83,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         </Script>
       </head>
 
-      <body className="flex flex-col min-h-screen">
+      <body className="flex flex-col min-h-screen m-0 p-0">
         {/* NoScript Pixel */}
         <noscript>
           <img
@@ -99,8 +99,8 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           <Navbar />
           <main className="flex-grow">
             {children}
-            <WhatsappButton />
           </main>
+          <WhatsappButton />
           <Footer />
         </CartProvider>
       </body>

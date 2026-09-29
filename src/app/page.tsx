@@ -2,82 +2,124 @@
 
 import Hero from "@/components/Hero"
 import ProductCard from "@/components/ProductCard"
-import { motion } from "framer-motion"
 import { Products } from "@/lib/products"
 import Image from "next/image"
-import { Minus } from "lucide-react"
 import Link from "next/link"
+import { ArrowRight, ArrowUpRight, Sparkles } from "lucide-react"
 
 export default function HomePage() {
-  const categoryOrder = ["Parachute", "Rexine", "Car Top Cover", "Rain Suites"]
-  const productGroups = categoryOrder
-    .map((category) => ({
-      category,
-      products: Products.filter((p) => p.category === category),
-    }))
-    .filter((group) => group.products.length > 0)
+  /* =========================================================
+     PRODUCTS
+  ========================================================= */
+
+  const perfumes = Products.filter(
+    (product) => product.category.toLowerCase() === "men" ||
+      product.category.toLowerCase() === "female" ||
+      product.category.toLowerCase() === "unisex"
+  )
+
+  const featuredProducts = perfumes.slice(0, 4)
+  const moreProducts = perfumes.slice(4, 12)
+
+  /* =========================================================
+     CATEGORIES — matched against real product.category values.
+     Each category's photo is pulled from the first product
+     that actually belongs to it, so "Men" always shows a
+     men's fragrance, "Female" always shows a women's one, etc.
+     Falls back to the first product overall if a category is
+     empty so the avatar never renders blank.
+  ========================================================= */
+
+  const findByCategory = (value: string) =>
+    Products.find((p) => p.category.toLowerCase() === value.toLowerCase())
 
   const categories = [
     {
-      name: "Parachute",
-      image: "/images/black-display.jpeg",
-      href: "/category/parachute",
+      name: "All",
+      href: "/products",
+      image: "/images/victoriassecretbombshellattar.jpeg",
     },
     {
-      name: "Rexine",
-      image: "/rexine.png",
-      href: "/category/Rexine",
+      name: "Men",
+      href: "/category/men",
+      image: findByCategory("Men")?.image ?? Products[0]?.image,
     },
     {
-      name: "Car Top",
-      image: "/images/boolan-cover2.png",
-      href: "/category/Car%20Top%20Cover",
+      name: "Women",
+      href: "/category/female",
+      image: findByCategory("Female")?.image ?? Products[0]?.image,
     },
     {
-      name: "Rain Suites",
-      image: "/images/rain-suite-black.png",
-      href: "/category/Rain%20Suites",
+      name: "Unisex",
+      href: "/category/unisex",
+      image: findByCategory("Unisex")?.image ?? Products[0]?.image,
     },
   ]
 
   return (
-    <main className="bg-[#FCFCFC] text-slate-900 selection:bg-slate-200 antialiased">
-      {/* Hero Section */}
-      <Hero />
+    <main className="min-h-screen bg-white text-[#171717] antialiased">
+      {/* =====================================================
+          HERO
+      ===================================================== */}
 
-     
+      <div className="pt-20">
+        <Hero />
+      </div>
 
-      {/* 2. Featured Categories */}
-      <section className="mx-auto max-w-7xl px-6 py-10">
-        <div className="mb-7 flex flex-col items-center text-center">
-          <div className="mb-2 flex items-center gap-2">
-            <Minus className="w-5 text-orange-400" />
-            <span className="text-[10px] font-bold uppercase tracking-[0.22em] text-orange-400">
-              Category
-            </span>
-            <Minus className="w-5 text-orange-400" />
-          </div>
-        </div>
+      {/* =====================================================
+          CATEGORY SELECTOR — circular, photo-led, no scrollbar
+      ===================================================== */}
 
-        <div className="category-scroll overflow-x-auto pb-2">
-          <div className="mx-auto flex min-w-max snap-x snap-mandatory gap-4 pr-12 md:min-w-0 md:max-w-2xl md:justify-center md:gap-6 md:pr-0">
-            {categories.map((cat) => (
+      <section className="border-b border-black/[0.06] bg-white">
+        <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 sm:py-10">
+          <div className="flex snap-x snap-mandatory gap-6 overflow-x-auto scroll-smooth scrollbar-hide sm:justify-center sm:gap-10">
+            {categories.map((category, index) => (
               <Link
-                key={cat.name}
-                href={cat.href}
-                className="group flex w-[28vw] min-w-24 max-w-32 shrink-0 snap-start flex-col items-center text-center md:w-36 md:max-w-36"
+                key={category.name}
+                href={category.href}
+                className="group flex shrink-0 snap-center flex-col items-center gap-2.5"
               >
-                <div className="relative aspect-square w-full overflow-hidden rounded-lg border border-slate-200 bg-slate-100 shadow-[0_16px_45px_rgba(15,23,42,0.08)] transition-all duration-300 group-hover:-translate-y-1 group-hover:border-orange-300 group-hover:shadow-[0_24px_60px_rgba(15,23,42,0.14)]">
-                  <Image
-                    src={cat.image}
-                    alt={cat.name}
-                    fill
-                    sizes="(min-width: 768px) 240px, 160px"
-                    className="object-cover transition-transform duration-500 group-hover:scale-105"
-                  />
-                </div>
-                <span className="mt-3 text-sm font-semibold text-slate-950 transition-colors group-hover:text-orange-500">
-                  {cat.name}
+                <span
+                  className={`
+                    relative grid size-16 shrink-0 place-items-center overflow-hidden
+                    rounded-full ring-1 ring-offset-4 ring-offset-white
+                    transition-all duration-300
+                    sm:size-20
+                    ${
+                      index === 0
+                        ? "ring-2 ring-[#b08a3c]"
+                        : "ring-black/[0.08] group-hover:ring-[#b08a3c]/60"
+                    }
+                  `}
+                >
+                  {category.image ? (
+                    <Image
+                      src={category.image}
+                      alt={category.name}
+                      fill
+                      className="object-cover transition-transform duration-500 group-hover:scale-110"
+                      sizes="80px"
+                    />
+                  ) : (
+                    <span className="text-[9px] font-semibold uppercase text-black/30">
+                      {category.name.slice(0, 2)}
+                    </span>
+                  )}
+                </span>
+
+                <span
+                  className={`
+                    whitespace-nowrap text-[10px] font-semibold uppercase tracking-[0.14em]
+                    transition-colors duration-300
+                    sm:text-[11px]
+                    ${
+                      index === 0
+                        ? "text-[#9b742e]"
+                        : "text-black/50 group-hover:text-[#9b742e]"
+                    }
+                  `}
+                >
+                  {category.name}
                 </span>
               </Link>
             ))}
@@ -85,98 +127,183 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* 3. Top Products */}
-      <section className="bg-white py-6 border-y border-slate-100">
-        <div className="max-w-7xl mx-auto px-6">
-          <div className="flex flex-col items-center text-center mb-10">
-            <div className="flex items-center gap-2 mb-2">
-              <Minus className="text-orange-400 w-5" />
-              <span className="text-orange-400 text-[10px] font-bold uppercase tracking-[0.22em]">
-                Our Essentials
-              </span>
-              <Minus className="text-orange-400 w-5" />
-            </div>
-            <p className="text-sm text-slate-500">
-              {Products.length} Products Across Collections
-            </p>
-          </div>
+      {/* =====================================================
+          FEATURED COLLECTION
+      ===================================================== */}
 
-          <div className="space-y-14">
-            {productGroups.map((group) => (
-              <div key={group.category}>
-                <div className="mb-6 flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
-                  <div>
-                    <p className="text-xs font-bold uppercase tracking-[0.2em] text-orange-500">
-                      {group.category}
-                    </p>
-                    <h2 className="mt-1 text-2xl font-semibold tracking-tight text-slate-950">
-                      {group.products.length} available
-                    </h2>
-                  </div>
-                  <Link
-                    href={`/category/${encodeURIComponent(group.category)}`}
-                    className="text-sm font-bold uppercase tracking-[0.16em] text-slate-800 transition-colors hover:text-orange-500"
-                  >
-                    View all →
-                  </Link>
-                </div>
-
-                <motion.div
-                  className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-x-8 gap-y-10"
-                  initial={{ opacity: 0.6 }}
-                  whileInView={{ opacity: 1 }}
-                  viewport={{ once: true, margin: "-40px" }}
-                  transition={{ duration: 0.3, ease: "easeOut" }}
-                >
-                  {group.products.map((product) => (
-                    <div key={product.id}>
-                      <ProductCard product={product} />
-                    </div>
-                  ))}
-                </motion.div>
+      <section className="bg-white">
+        <div className="mx-auto max-w-7xl px-4 py-16 sm:px-6 sm:py-24">
+          {/* Section Heading */}
+          <div className="mb-10 flex items-end justify-between sm:mb-14">
+            <div>
+              <div className="mb-3 flex items-center gap-2">
+                <span className="h-px w-6 bg-[#b08a3c]" />
+                <span className="text-[9px] font-semibold uppercase tracking-[0.28em] text-[#a17b32]">
+                  Our Selection
+                </span>
               </div>
-            ))}
-          </div>
-        </div>
-      </section>
 
-      {/* 4. Promotional Banner - Minimalist Boldness */}
-      <section className="py-32 px-6">
-        <div className="max-w-7xl mx-auto relative overflow-hidden bg-slate-900 min-h-[500px] flex items-center">
-          <img
-            src="/newarrival.png"
-            alt="Promotion"
-            className="absolute inset-0 w-full h-full object-cover opacity-50 transition-transform duration-[10s] hover:scale-110"
-          />
-          <div className="relative z-10 px-8 md:px-24 text-center md:text-left">
-            <h3 className="text-white text-5xl md:text-7xl font-serif mb-8 leading-[1.1]">The Winter <br/>Edition 2024</h3>
-            <p className="text-white/70 text-lg mb-10 max-w-md leading-relaxed">
-              Experience the fusion of artisanal craftsmanship and modern durability.
-            </p>
-           <Link href="/category/parachute">
-           
-           <button className="inline-block bg-orange-400 text-white px-10 py-5 text-xs font-bold uppercase tracking-[0.2em] hover:bg-white hover:text-black transition-all duration-300">
-              Explore New Arrivals
-            </button>
-           </Link> 
-          </div>
-        </div>
-      </section>
+              <h2 className="font-serif text-3xl font-medium tracking-tight text-[#171717] sm:text-4xl">
+                Signature Fragrances
+              </h2>
 
-      {/* 5. Benefits Section - Clean & Balanced */}
-      <section className="max-w-5xl mx-auto pt-10 pb-20 px-6">
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-20">
-          {[
-            { title: "Delivery", desc: "Reliable nationwide logistics ensuring your order arrives in pristine condition." },
-            { title: "Quality", desc: "Using only the finest Rexine and Parachute fabrics tested for extreme weather." },
-            { title: "Support", desc: "A dedicated concierge service available 24/7 for all your tailoring needs." },
-          ].map((item, idx) => (
-            <div key={idx} className="flex flex-col items-center text-center">
-              <span className="text-orange-400 text-4xl font-serif mb-6">0{idx + 1}</span>
-              <h3 className="text-xs font-bold uppercase tracking-[0.3em] mb-4 text-slate-900">{item.title}</h3>
-              <p className="text-slate-500 text-sm leading-relaxed font-light">{item.desc}</p>
+              <p className="mt-2 max-w-md text-xs leading-5 text-black/40 sm:text-sm">
+                Discover fragrances selected for elegance, character and
+                everyday sophistication.
+              </p>
             </div>
-          ))}
+
+            <Link
+              href="/products"
+              className="group hidden items-center gap-2 text-[10px] font-semibold uppercase tracking-[0.18em] text-black/50 transition-colors hover:text-[#a17b32] sm:flex"
+            >
+              View All
+              <ArrowRight className="size-3.5 transition-transform group-hover:translate-x-1" />
+            </Link>
+          </div>
+
+          {/* Products */}
+          {featuredProducts.length > 0 ? (
+            <div className="grid gap-x-3 gap-y-10 sm:grid-cols-2 sm:gap-x-5 sm:gap-y-12 lg:grid-cols-4 lg:gap-x-6">
+              {featuredProducts.map((product) => (
+                <ProductCard key={product.id} product={product} />
+              ))}
+            </div>
+          ) : (
+            <div className="py-16 text-center text-sm text-black/40">
+              No fragrances available yet.
+            </div>
+          )}
+
+          {/* Mobile View All */}
+          <div className="mt-10 flex justify-center sm:hidden">
+            <Link
+              href="/products"
+              className="inline-flex items-center gap-2 rounded-full border border-black/10 px-6 py-3 text-[10px] font-semibold uppercase tracking-[0.18em] text-black/60 transition hover:border-[#b08a3c] hover:text-[#a17b32]"
+            >
+              View All Fragrances
+              <ArrowRight className="size-3.5" />
+            </Link>
+          </div>
+        </div>
+      </section>
+
+      {/* =====================================================
+          LUXURY PERFUME BANNER
+      ===================================================== */}
+
+      <section className="px-4 sm:px-6">
+        <div className="relative mx-auto h-[440px] max-w-7xl overflow-hidden rounded-[1.75rem] sm:h-[540px] sm:rounded-[2.25rem]">
+          <Image
+            src="/hero3.png"
+            alt="Luxury Perfume Collection"
+            fill
+            className="object-cover"
+            sizes="100vw"
+          />
+
+          <div className="absolute inset-0 bg-black/35" />
+          <div className="absolute inset-0 bg-gradient-to-r from-black/60 via-black/25 to-transparent" />
+
+          <div className="relative z-10 flex h-full items-center px-6 sm:px-12 lg:px-20">
+            <div className="max-w-lg text-white">
+              <div className="mb-4 flex items-center gap-2">
+                <Sparkles className="size-3.5 text-[#d0ad68]" />
+                <span className="text-[9px] font-semibold uppercase tracking-[0.3em] text-white/70">
+                  The Art of Fragrance
+                </span>
+              </div>
+
+              <h2 className="font-serif text-4xl font-medium leading-tight tracking-tight sm:text-5xl lg:text-6xl">
+                A scent that
+                <br />
+                becomes your signature.
+              </h2>
+
+              <p className="mt-5 max-w-md text-xs leading-6 text-white/70 sm:text-sm sm:leading-7">
+                Explore refined fragrances created for those who appreciate
+                subtle luxury, confidence and individuality.
+              </p>
+
+              <Link
+                href="/products"
+                className="group mt-7 inline-flex items-center gap-3 rounded-full bg-white px-6 py-3.5 text-[10px] font-semibold uppercase tracking-[0.18em] text-black transition-all hover:bg-[#b08a3c] hover:text-white"
+              >
+                Discover Fragrances
+                <ArrowUpRight className="size-4 transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
+              </Link>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* =====================================================
+          MORE PRODUCTS
+      ===================================================== */}
+
+      {moreProducts.length > 0 && (
+        <section className="bg-white">
+          <div className="mx-auto max-w-7xl px-4 py-16 sm:px-6 sm:py-24">
+            <div className="mb-10 text-center sm:mb-14">
+              <div className="flex items-center justify-center gap-2">
+                <span className="h-px w-6 bg-[#b08a3c]" />
+                <span className="text-[9px] font-semibold uppercase tracking-[0.28em] text-[#a17b32]">
+                  Explore More
+                </span>
+                <span className="h-px w-6 bg-[#b08a3c]" />
+              </div>
+
+              <h2 className="mt-3 font-serif text-3xl font-medium tracking-tight text-[#171717] sm:text-4xl">
+                More to Discover
+              </h2>
+
+              <p className="mx-auto mt-2 max-w-md text-xs leading-5 text-black/40 sm:text-sm">
+                Find the fragrance that fits your personality and your
+                moment.
+              </p>
+            </div>
+
+            <div className="grid grid-cols-2 gap-x-3 gap-y-10 sm:grid-cols-2 sm:gap-x-5 sm:gap-y-12 lg:grid-cols-4 lg:gap-x-6">
+              {moreProducts.map((product) => (
+                <ProductCard key={product.id} product={product} />
+              ))}
+            </div>
+
+            <div className="mt-14 flex justify-center">
+              <Link
+                href="/products"
+                className="group inline-flex items-center gap-3 rounded-full border border-black/10 px-7 py-3.5 text-[10px] font-semibold uppercase tracking-[0.18em] text-black/60 transition-all hover:border-[#b08a3c] hover:bg-[#fbf8f0] hover:text-[#9b742e]"
+              >
+                Explore Full Collection
+                <ArrowRight className="size-4 transition-transform group-hover:translate-x-1" />
+              </Link>
+            </div>
+          </div>
+        </section>
+      )}
+
+      {/* =====================================================
+          FINAL BRAND STATEMENT
+      ===================================================== */}
+
+      <section className="border-t border-black/[0.06] bg-[#faf9f6]">
+        <div className="mx-auto max-w-3xl px-6 py-20 text-center sm:py-28">
+          <div className="mx-auto mb-5 flex size-10 items-center justify-center rounded-full border border-[#b08a3c]/30">
+            <Sparkles className="size-4 text-[#a17b32]" />
+          </div>
+
+          <p className="text-[9px] font-semibold uppercase tracking-[0.3em] text-[#a17b32]">
+            Wear Your Identity
+          </p>
+
+          <h2 className="mt-3 font-serif text-3xl font-medium leading-tight text-[#171717] sm:text-4xl">
+            Fragrance is more than a scent.
+          </h2>
+
+          <p className="mx-auto mt-4 max-w-xl text-xs leading-6 text-black/45 sm:text-sm sm:leading-7">
+            It is the impression you leave behind, the memory someone carries
+            with them, and a quiet expression of who you are.
+          </p>
         </div>
       </section>
     </main>

@@ -7,7 +7,7 @@ import { Products } from "@/lib/products";
 
 const WhatsAppButton: React.FC = () => {
   const pathname = usePathname();
-  const phoneNumber = "+923172017176"; // Your number
+  const phoneNumber = "+923172721640"; // Your number
   const productMatch = pathname.match(/^\/products\/([^/]+)/);
   const categoryMatch = pathname.match(/^\/category\/([^/]+)/);
 
