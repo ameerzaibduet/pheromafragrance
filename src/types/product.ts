@@ -8,6 +8,7 @@ export type ProductSize = {
 export type ProductColor = {
   name: string
   image: string
+  displayImage?: string
   default?: boolean
 }
 
@@ -20,6 +21,13 @@ export type Product = {
   category: string
   description: string
   quantity: number
+
+  uncoveredImage?: string
+
+  carDetails?: {
+    carName: string
+  }
+
   sizes?: ProductSize[]
   colors?: ProductColor[]
 }
