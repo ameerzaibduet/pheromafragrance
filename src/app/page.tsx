@@ -1,5 +1,7 @@
 "use client"
 
+
+import ProductReviews from "@/components/ProductReviews"
 import Hero from "@/components/Hero"
 import ProductCard from "@/components/ProductCard"
 import { Products } from "@/lib/products"
@@ -7,12 +9,36 @@ import Image from "next/image"
 import Link from "next/link"
 import { ArrowRight, ArrowUpRight, Sparkles } from "lucide-react"
 
+/* =========================================================
+   HOME PAGE SIZE
+   Home page cards show this size's image + price.
+   Only affects copies used on this page — products.ts,
+   default sizes, shop and detail pages are untouched.
+========================================================= */
+
+const HOME_SIZE = "50ml"
+
+const withHomeSize = (product: (typeof Products)[number]) => {
+  const size = product.sizes?.find((s) => s.size === HOME_SIZE)
+  if (!size) return product // no 50ml? leave the product as it is
+
+  return {
+    ...product,
+    price: size.price,
+    image: size.image,
+    // card reads the default size, so point the default at 50ml (this copy only)
+    sizes: product.sizes?.map((s) => ({ ...s, default: s.size === HOME_SIZE })),
+  }
+}
+
 export default function HomePage() {
   /* =========================================================
      PRODUCTS
   ========================================================= */
 
-  const perfumes = Products.filter(
+  const homeProducts = Products.map(withHomeSize)
+
+  const perfumes = homeProducts.filter(
     (product) => product.category.toLowerCase() === "men" ||
       product.category.toLowerCase() === "female" ||
       product.category.toLowerCase() === "unisex"
@@ -31,7 +57,7 @@ export default function HomePage() {
   ========================================================= */
 
   const findByCategory = (value: string) =>
-    Products.find((p) => p.category.toLowerCase() === value.toLowerCase())
+    homeProducts.find((p) => p.category.toLowerCase() === value.toLowerCase())
 
   const categories = [
     {
@@ -42,17 +68,17 @@ export default function HomePage() {
     {
       name: "Men",
       href: "/category/men",
-      image: findByCategory("Men")?.image ?? Products[0]?.image,
+      image: findByCategory("Men")?.image ?? homeProducts[0]?.image,
     },
     {
       name: "Women",
       href: "/category/female",
-      image: findByCategory("Female")?.image ?? Products[0]?.image,
+      image: findByCategory("Female")?.image ?? homeProducts[0]?.image,
     },
     {
       name: "Unisex",
       href: "/category/unisex",
-      image: findByCategory("Unisex")?.image ?? Products[0]?.image,
+      image: findByCategory("Unisex")?.image ?? homeProducts[0]?.image,
     },
   ]
 
@@ -281,6 +307,8 @@ export default function HomePage() {
           </div>
         </section>
       )}
+
+      <ProductReviews latestOnly />
 
       {/* =====================================================
           FINAL BRAND STATEMENT

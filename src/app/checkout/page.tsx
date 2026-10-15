@@ -21,8 +21,6 @@ import {
 } from "@/components/ui/command"
 import { ChevronsUpDown, MapPin, ShoppingBag } from "lucide-react"
 import { CITIES } from "@/lib/cities"
-import { cartContainsTopCover } from "@/lib/car-top-cover"
-import { cartContainsRainSuit } from "@/lib/rain-suit"
 import { formatPrice } from "@/lib/format-price"
 import { useCustomerOrders } from "@/lib/use-customer-orders"
 import {
@@ -48,12 +46,6 @@ export default function CheckoutPage() {
   const [errorMsg, setErrorMsg] = useState("")
   const [cityOpen, setCityOpen] = useState(false)
 
-  const [bike70, setBike70] = useState(false)
-  const [bike100, setBike100] = useState(false)
-  const [bike110, setBike110] = useState(false)
-  const [bike125, setBike125] = useState(false)
-  const [bike150, setBike150] = useState(false)
-
   const [location, setLocation] = useState<{
     latitude: number
     longitude: number
@@ -72,9 +64,6 @@ export default function CheckoutPage() {
   }
 
   const total = cart.reduce((sum, item) => sum + item.price * item.quantity, 0)
-  const hasTopCover = cartContainsTopCover(cart)
-  const hasRainSuit = cartContainsRainSuit(cart)
-  const showBikeOptions = !hasTopCover && !hasRainSuit
 
   const getLocation = () => {
     if (!navigator.geolocation) {
@@ -113,15 +102,6 @@ export default function CheckoutPage() {
       return
     }
 
-    const selectedBikes = []
-    if (showBikeOptions) {
-      if (bike70) selectedBikes.push("70cc")
-      if (bike100) selectedBikes.push("100cc")
-      if (bike110) selectedBikes.push("110cc")
-      if (bike125) selectedBikes.push("125cc")
-      if (bike150) selectedBikes.push("150cc")
-    }
-
     setLoading(true)
 
     const order = {
@@ -130,7 +110,8 @@ export default function CheckoutPage() {
       email: email || null,
       city,
       address,
-      bike_specifications: selectedBikes.join(", "),
+      // kept as an empty string so the existing orders table column still gets a value
+      bike_specifications: "",
       latitude: location?.latitude || null,
       longitude: location?.longitude || null,
       items: cart.map((item) => ({
@@ -285,37 +266,6 @@ export default function CheckoutPage() {
 
             {location && (
               <p className="text-xs text-green-600">GPS saved successfully</p>
-            )}
-
-            {showBikeOptions && (
-              <div className="rounded-xl border border-slate-100 bg-slate-50 p-4">
-                <p className="text-sm font-bold text-slate-900">Bike engine size</p>
-                <p className="mt-1 text-xs text-slate-500">
-                  Optional — helps us confirm the right seat cover fit
-                </p>
-                <div className="mt-3 grid grid-cols-2 gap-2 sm:grid-cols-3">
-                  {[
-                    { label: "70cc", state: bike70, set: setBike70 },
-                    { label: "100cc", state: bike100, set: setBike100 },
-                    { label: "110cc", state: bike110, set: setBike110 },
-                    { label: "125cc", state: bike125, set: setBike125 },
-                    { label: "150cc", state: bike150, set: setBike150 },
-                  ].map((b) => (
-                    <label
-                      key={b.label}
-                      className="flex cursor-pointer items-center gap-2 rounded-xl border border-slate-200 bg-white px-3 py-2.5 text-sm font-medium"
-                    >
-                      <input
-                        type="checkbox"
-                        checked={b.state}
-                        onChange={(e) => b.set(e.target.checked)}
-                        className="accent-orange-500"
-                      />
-                      {b.label}
-                    </label>
-                  ))}
-                </div>
-              </div>
             )}
           </div>
         </div>

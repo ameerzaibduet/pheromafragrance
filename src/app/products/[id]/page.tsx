@@ -1,5 +1,7 @@
 "use client"
 
+
+import ProductReviews from "@/components/ProductReviews"
 import { use, useEffect, useState } from "react"
 import { notFound, useRouter } from "next/navigation"
 import Image from "next/image"
@@ -50,13 +52,6 @@ import {
 type Props = {
   params: Promise<{ id: string }>
 }
-
-const bikeTypes = [
-  "70cc",
-  "110cc",
-  "125cc",
-  "150cc",
-]
 
 /* =========================================================
    DESCRIPTION HELPERS
@@ -258,15 +253,6 @@ export default function ProductDetailPage({
       product?.colors?.[0]?.name ||
       "black"
   )
-
-  /* =======================================================
-     BIKE TYPE
-  ======================================================= */
-
-  const [
-    selectedCC,
-    setSelectedCC,
-  ] = useState("70cc")
 
   /* =======================================================
      DESCRIPTION
@@ -1078,56 +1064,19 @@ export default function ProductDetailPage({
               </section>
             )}
 
-            {/* =================================================
-                BIKE SIZE
-            ================================================= */}
-
-            {!isCarTopCover &&
-              !isRainSuit &&
-              !isPerfume && (
-
-                <div className="mt-7">
-
-                  <p className="mb-2.5 text-xs font-semibold text-black/75">
-                    Bike engine size
-                  </p>
-
-                  <div className="flex flex-wrap gap-2">
-
-                    {bikeTypes.map(
-                      (cc) => (
-
-                        <button
-                          key={cc}
-                          type="button"
-                          onClick={() =>
-                            setSelectedCC(
-                              cc
-                            )
-                          }
-                          className={clsx(
-                            "rounded-full border px-4 py-2 text-xs font-medium transition-all",
-
-                            selectedCC ===
-                              cc
-                              ? "border-[#b08a3c] bg-[#b08a3c] text-white"
-                              : "border-black/10 bg-white text-black/60 hover:border-[#b08a3c]"
-                          )}
-                        >
-                          {cc}
-                        </button>
-
-                      )
-                    )}
-
-                  </div>
-
-                </div>
-              )}
-
           </div>
 
         </div>
+
+  {/* CUSTOMER REVIEWS */}
+<section className="mt-16 border-t border-black/[0.08] pt-12 sm:mt-24 sm:pt-16">
+  <ProductReviews
+    productId={product.id}
+    productName={product.name}
+  />
+</section>
+
+
 
         {/* =====================================================
             RELATED PRODUCTS
